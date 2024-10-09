@@ -35,4 +35,9 @@ Route::middleware('auth')->group(function () {
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
 });
 
+Route::get('/ccentre', function () {
+    return Inertia::render('CCentre');
+})->name('ccentre');
+
+
 require __DIR__.'/auth.php';

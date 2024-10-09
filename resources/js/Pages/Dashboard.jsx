@@ -5,7 +5,7 @@ export default function Dashboard({ auth }) {
     return (
         <AuthenticatedLayout
             user={auth.user}
-            header={<h2 className="font-semibold text-xl text-gray-100 leading-tight">Robot Dashboard</h2>} // Updated header text and color
+            header={<h2 className="font-semibold text-2xl text-blakc-200 leading-tight">Robot Dashboard</h2>} // Updated header text and color
         >
             <Head title="Dashboard" />
 
