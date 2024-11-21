@@ -2,9 +2,11 @@ import { useState } from 'react';
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
 import { Head, useForm } from '@inertiajs/react';
 
-export default function CCentre({ auth, initialRobots, flash }) {
+export default function CCentre({ auth, initialRobots }) {
     const [robots, setRobots] = useState(initialRobots || []);
-    const { data, setData, post, processing, errors } = useForm({
+    const [cooldown, setCooldown] = useState(false); // Cooldown state
+
+    const { data, setData, post, processing, errors, reset } = useForm({
         name: '',
         task: '',
         power_level: 100,
@@ -16,14 +18,13 @@ export default function CCentre({ auth, initialRobots, flash }) {
 
         // Send a POST request to the backend to create a new robot
         post('/robots', data, {
-            onSuccess: (response) => {
-                // Assuming the response contains the robot, update the robots list
-                if (response.robot) {
-                    setRobots((prev) => [...prev, response.robot]);
-                }
+            onSuccess: () => {
+                reset(); // Clear the form after successful submission
+                setCooldown(true); // Start the cooldown
+                setTimeout(() => setCooldown(false), 5000); // Reset cooldown after 5 seconds
 
-                // Optionally clear form data after submit
-                setData({ name: '', task: '', power_level: 100 });
+                // Redirect to the robots page after successful creation
+                window.location.href = '/robots'; // Update the route to match your robots listing page
             },
         });
     };
@@ -31,7 +32,7 @@ export default function CCentre({ auth, initialRobots, flash }) {
     return (
         <AuthenticatedLayout
             user={auth.user}
-            header={<h2 className="font-semibold text-2xl text-black-200 leading-tight">Robot Control Centre</h2>}
+            header={<h2 className="font-semibold text-2xl text-gray-200 leading-tight">Robot Control Centre</h2>}
         >
             <Head title="Robot Control Centre" />
 
@@ -41,7 +42,7 @@ export default function CCentre({ auth, initialRobots, flash }) {
                     {/* Section: Robot Fleet */}
                     <div className="bg-gray-800 shadow-lg rounded-lg p-6">
                         <h3 className="text-lg font-semibold text-gray-100 mb-4">Robot Fleet Overview</h3>
-                        
+
                         {/* Add Robot Form */}
                         <form onSubmit={handleCreateRobot} className="mb-4">
                             <div className="mb-4">
@@ -90,10 +91,12 @@ export default function CCentre({ auth, initialRobots, flash }) {
 
                             <button
                                 type="submit"
-                                className={`bg-blue-500 text-white p-2 rounded mt-4 ${processing ? 'opacity-50' : ''}`}
-                                disabled={processing}
+                                className={`bg-blue-500 text-white p-2 rounded mt-4 ${
+                                    processing || cooldown ? 'opacity-50 cursor-not-allowed' : ''
+                                }`}
+                                disabled={processing || cooldown} // Disable during processing or cooldown
                             >
-                                {processing ? 'Creating...' : 'Add Robot'}
+                                {cooldown ? 'Cooldown (5s)...' : processing ? 'Creating...' : 'Add Robot'}
                             </button>
                         </form>
 

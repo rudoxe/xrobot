@@ -9,10 +9,9 @@ class Robot extends Model
 {
     use HasFactory;
 
-    // Remove 'type' from the fillable array
     protected $fillable = [
         'name',
         'task',
-        'power_level', // Keep only the fields you need
+        'power_level',
     ];
 }
