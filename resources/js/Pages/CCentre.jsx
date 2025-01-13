@@ -16,15 +16,27 @@ export default function CCentre({ auth, initialRobots }) {
     const handleCreateRobot = (e) => {
         e.preventDefault();
 
-        // Send a POST request to the backend to create a new robot
         post('/robots', data, {
             onSuccess: () => {
                 reset(); // Clear the form after successful submission
                 setCooldown(true); // Start the cooldown
                 setTimeout(() => setCooldown(false), 5000); // Reset cooldown after 5 seconds
+                window.location.href = '/robots'; // Redirect to robots page
+            },
+        });
+    };
 
-                // Redirect to the robots page after successful creation
-                window.location.href = '/robots'; // Update the route to match your robots listing page
+    // Function to create a random robot
+    const createRandomRobot = () => {
+        const randomName = `Robot-${Math.floor(Math.random() * 10000)}`; // Generate a random name
+        const randomTask = ['Cleaning', 'Exploring', 'Assembling', 'Patrolling'][Math.floor(Math.random() * 4)]; // Random task
+
+        // Post request to create the robot
+        post('/robots', { name: randomName, task: randomTask, power_level: Math.floor(Math.random() * 101) }, {
+            onSuccess: () => {
+                setCooldown(true); // Start cooldown
+                setTimeout(() => setCooldown(false), 5000); // Reset cooldown after 5 seconds
+                window.location.href = '/robots'; // Redirect to robots page
             },
         });
     };
@@ -94,11 +106,22 @@ export default function CCentre({ auth, initialRobots }) {
                                 className={`bg-blue-500 text-white p-2 rounded mt-4 ${
                                     processing || cooldown ? 'opacity-50 cursor-not-allowed' : ''
                                 }`}
-                                disabled={processing || cooldown} // Disable during processing or cooldown
+                                disabled={processing || cooldown}
                             >
                                 {cooldown ? 'Cooldown (5s)...' : processing ? 'Creating...' : 'Add Robot'}
                             </button>
                         </form>
+
+                        {/* Random Robot Button */}
+                        <button
+                            onClick={createRandomRobot}
+                            className={`bg-green-500 text-white p-2 rounded mt-4 ${
+                                cooldown ? 'opacity-50 cursor-not-allowed' : ''
+                            }`}
+                            disabled={cooldown}
+                        >
+                            {cooldown ? 'Cooldown (5s)...' : 'Create Random Robot'}
+                        </button>
 
                         {/* Robot List */}
                         <div className="mt-4 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
